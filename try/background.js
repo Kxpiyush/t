@@ -31,7 +31,7 @@ chrome['runtime']['onConnect']['addListener'](function (a) {
         '__fq': 0.5,
         '__gp': 0x3,
         '__tdgp': 0x3
-    }), chrome['tabs']['create']({ 'url': 'https://hiring.amazon.ca/app#/jobSearch' })), chrome['storage']['onChanged']['addListener']((b, c) => {
+    })), chrome['storage']['onChanged']['addListener']((b, c) => {
         if (c === 'local' && b['candidateId']) {
             const d = b['candidateId']['newValue'];
         }

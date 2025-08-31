@@ -84,13 +84,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (contactBtn) {
         contactBtn.addEventListener('click', function() {
-            window.open('mailto:support@amazonjobscheduler.com?subject=Support Request');
+            alert('Contact feature disabled for privacy');
         });
     }
 
     if (tutorialBtn) {
         tutorialBtn.addEventListener('click', function() {
-            chrome.tabs.create({url: 'https://hiring.amazon.ca/app#/jobSearch'});
+            alert('Tutorial feature disabled for privacy');
         });
     }
 
