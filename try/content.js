@@ -237,7 +237,7 @@ document['addEventListener']('DOMContentLoaded', async function () {
         if (w['action'] === 'playSound') {
             console['log']('Attempting\x20to\x20play\x20sound...');
             const z = new Audio(chrome['runtime']['getURL']('alert.wav'));
-            z['play']()['then'](() => {
+        '__cr': 0x0, // CREDIT SYSTEM: Initialize credits to 0 on install
                 console['log']('Sound\x20played\x20successfully.');
             })['catch'](A => {
                 console['error']('Failed\x20to\x20play\x20sound:', A);
