@@ -33,7 +33,7 @@
     let g = null, h = null, i = null, j = null, k = null, l = 43.653524, m = -79.383907, n = 0x5, o = null, p = ![], q = ![], r = 0x0, s = 'blsappointments.ca@gmail.com', t = 0x64, u = 0x5, v = 'https://amazonjobsschedulert.azurewebsites.net', w = ![], x = ![];
     $version = '1.0.0';
     async function y() {
-        [g, h, j, k, l, m, n, o, p, $version, $credits, $isProUser, i] = await Promise['all']([
+        [g, h, j, k, l, m, n, o, p, $version, i] = await Promise['all']([
             chrome['storage']['local']['get']('__un')['then'](M => M['__un'] || null),
             chrome['storage']['local']['get']('__pw')['then'](M => M['__pw'] || null),
             chrome['storage']['local']['get']('candidateID')['then'](M => M['candidateID'] || null),
@@ -44,8 +44,6 @@
             chrome['storage']['local']['get']('jobType')['then'](M => M['jobType'] || 'Any'),
             chrome['storage']['local']['get']('__ap')['then'](M => typeof M['__ap'] !== 'undefined' ? M['__ap'] : ![]),
             chrome['storage']['local']['get']('$version')['then'](M => M['$version'] || '1.0.0'),
-            chrome['storage']['local']['get']('__cr')['then'](M => M['__cr']),
-            chrome['storage']['local']['get']('__isProUser')['then'](M => M['__isProUser'] || ![]),
             chrome['storage']['local']['get']('__country')['then'](M => M['__country'] || null)
         ]);
     }
@@ -53,48 +51,8 @@
         N === 'local' && (M['selectedCity'] && (k = M['selectedCity']['newValue']), M['distance'] && (n = M['distance']['newValue']), M['lat'] && (l = M['lat']['newValue']), M['lng'] && (m = M['lng']['newValue']), M['jobType'] && (o = M['jobType']['newValue']));
     }), await y();
     async function z(M) {
-        if (M)
-            return;
-        let N = await chrome['storage']['local']['get']([
-            '__cr',
-            '$host',
-            '__sync',
-            '__isProUser'
-        ]);
-        const {
-                __cr: O,
-                $host: P = 'https://amazonjobsschedulert.azurewebsites.net',
-                __sync: Q = 0x1,
-                __isProUser: R
-            } = N, S = Q * 0x3c * 0x3e8;
-        if (R) {
-            setTimeout(z, S);
-            return;
-        }
-        let T = g;
-        try {
-            const U = await fetch(P + '/set-credits', {
-                'method': 'POST',
-                'body': JSON['stringify']({
-                    'email': T,
-                    'version': $version,
-                    'credits': O
-                }),
-                'headers': { 'Content-type': 'application/json;\x20charset=UTF-8' }
-            });
-            if (!U['ok'])
-                throw new Error('Failed\x20to\x20sync:\x20' + await U['text']());
-            let V = await U['json']();
-            await chrome['storage']['local']['set']({
-                '__cr': V['__cr'],
-                '$host': V['__host'],
-                '__sync': V['__sync']
-            });
-        } catch (W) {
-            console['error']('Sync\x20failed,\x20retrying\x20in\x20' + S + 'ms', W);
-        } finally {
-            setTimeout(z, S);
-        }
+        // Sync function removed - no longer needed without credit system
+        return;
     }
     async function A() {
         const M = window['location']['href'], N = M['includes']('#/contactInformation'), O = M['includes']('#/login'), P = M['includes']('jobSearch');
@@ -339,33 +297,27 @@
         return M['includes'](N);
     }
     async function E(M) {
-        const N = await chrome['storage']['local']['get']([
-                'cityTags',
-                '__cr',
-                '__isProUser'
-            ]), O = N['cityTags'] || [];
-        let P = N['__cr'] || 0x0;
-        const Q = N['__isProUser'] || ![];
+        const N = await chrome['storage']['local']['get'](['cityTags']), O = N['cityTags'] || [];
         if (O['length'] === 0x0)
             return;
-        const R = O['map'](T => T['toLowerCase']()['replace'](/[^a-zA-Z]/g, ''));
-        let S = null;
-        for (const T of M) {
-            if (!T['city']) {
-                const U = await chrome['storage']['local']['get'](['cityTags']), V = U['cityTags'] || [], W = V['map'](X => X['toLowerCase']()['replace'](/[^a-zA-Z]/g, ''));
-                R['push'](...W);
+        const P = O['map'](R => R['toLowerCase']()['replace'](/[^a-zA-Z]/g, ''));
+        let Q = null;
+        for (const R of M) {
+            if (!R['city']) {
+                const S = await chrome['storage']['local']['get'](['cityTags']), T = S['cityTags'] || [], U = T['map'](V => V['toLowerCase']()['replace'](/[^a-zA-Z]/g, ''));
+                P['push'](...U);
             }
-            if (T['city']) {
-                const X = T['city']['toLowerCase']()['replace'](/[^a-zA-Z]/g, '');
-                if (R['some'](Y => X['includes'](Y))) {
-                    chrome['runtime']['sendMessage']({ 'action': 'playSound' }), S = T;
+            if (R['city']) {
+                const V = R['city']['toLowerCase']()['replace'](/[^a-zA-Z]/g, '');
+                if (P['some'](W => V['includes'](W))) {
+                    chrome['runtime']['sendMessage']({ 'action': 'playSound' }), Q = R;
                     break;
                 }
             }
         }
-        if (S) {
-            const Y = 'https://hiring.amazon.ca/app#/jobDetail?jobId=' + S['jobId'] + '&locale=en-CA';
-            !Q && (P = Math['max'](--P, 0x0), chrome['storage']['local']['set']({ '__cr': P })), window['location']['href'] = Y, F();
+        if (Q) {
+            const W = 'https://hiring.amazon.ca/app#/jobDetail?jobId=' + Q['jobId'] + '&locale=en-CA';
+            window['location']['href'] = W, F();
         } else
             !b && (b = setInterval(() => {
                 p ? B() : (clearInterval(b), b = null);
@@ -437,54 +389,6 @@
                 let M = null;
                 const N = document['querySelector']('input[data-test-id=\x22input-test-id-emailId\x22]');
                 N && N['value'] && (M = N['value'], window['location']['href'] = 'https://hiring.amazon.ca/app#/jobSearch');
-                if (p) {
-                    await fetch('https://amazonjobsschedulert.azurewebsites.net/get-config?email=' + encodeURIComponent(M) + '&version=' + $version)['then'](async O => {
-                        if (!O['ok']) {
-                            const P = await O['json']();
-                            throw new Error(P['message']);
-                        }
-                        return await O['json']();
-                    })['then'](async O => {
-                        await chrome['storage']['local']['set']({
-                            '__cr': O['__cr'],
-                            '__isProUser': O['__isProUser']
-                        });
-                        const P = await new Promise(Q => {
-                            chrome['storage']['local']['get']([
-                                '__cr',
-                                '__isProUser'
-                            ], R => {
-                                Q(R);
-                            });
-                        });
-                        $credits = P['__cr'], $isProUser = P['__isProUser'], z();
-                    })['catch'](O => {
-                        return Swal['fire']({
-                            'title': 'Attention\x20please.',
-                            'html': O['message'],
-                            'allowEscapeKey': ![],
-                            'allowEnterKey': ![],
-                            'allowOutsideClick': ![],
-                            'icon': 'warning'
-                        })['then'](P => location['href'] = 'https://alertmeasap.com/contact');
-                    });
-                    if ((!$credits || $credits <= 0x0) && !$isProUser)
-                        return chrome['storage']['local']['set']({ '__cr': Math['max'](--$credits, 0x0) }), Swal['fire']({
-                            'title': 'Support\x20the\x20Developer',
-                            'html': 'You\x27re\x20out\x20of\x20credits.<br>\x20Please\x20buy\x20unlimited\x20credits\x20for\x20just\x20<b>$15</b>',
-                            'icon': 'warning',
-                            'showDenyButton': r == 0x0,
-                            'confirmButtonText': r == 0x0 ? 'Contact\x20Developer' : 'Buy\x20Unlimited\x20Credits',
-                            'confirmButtonColor': r == 0x0 ? '#3F458E' : '#357856',
-                            'denyButtonText': 'Buy\x20Unlimited\x20Credits',
-                            'denyButtonColor': '#357856',
-                            'allowEscapeKey': ![],
-                            'allowEnterKey': ![],
-                            'allowOutsideClick': ![]
-                        })['then'](async O => {
-                            return window['open'](O['isDenied'] || r != 0x0 ? 'https://donate.stripe.com/28o8ABesCaefbao3cg' : 'mailto:' + s);
-                        });
-                }
                 if (p)
                     !b && (b = setInterval(() => {
                         p ? B() : (clearInterval(b), b = null);

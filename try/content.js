@@ -172,7 +172,6 @@ document['addEventListener']('DOMContentLoaded', async function () {
         let x = document['getElementById']('reset_info');
         x['setAttribute']('disabled', 'disabled'), await new Promise(y => setTimeout(y, 0x1f4)), await chrome['storage']['local']['clear'](), await chrome['storage']['local']['set']({
             '__ap': !![],
-            '__cr': 0x0,
             'selectedCity': 'Toronto',
             'lat': 43.653524,
             'lng': -79.383907,

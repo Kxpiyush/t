@@ -50,7 +50,7 @@ async function waitForEmailInput() {
     
     // Function to fetch and initialize all necessary local storage variables
     async function initializeLocalStorageVariables() {
-        [$username, $password, $candidateID, $selectedCity, $lat, $lng, $distance, $jobType, $active, $version, $credits, $isProUser] = await Promise.all([
+        [$username, $password, $candidateID, $selectedCity, $lat, $lng, $distance, $jobType, $active, $version] = await Promise.all([
             chrome.storage.local.get("__un").then(result => result.__un || null),
             chrome.storage.local.get("__pw").then(result => result.__pw || null),
             chrome.storage.local.get("candidateID").then(result => result.candidateID || null),
@@ -60,9 +60,7 @@ async function waitForEmailInput() {
             chrome.storage.local.get("distance").then(result => result.distance || 150),
             chrome.storage.local.get("jobType").then(result => result.jobType || "Any"),
             chrome.storage.local.get("__ap").then(result => typeof result.__ap !== "undefined" ? result.__ap : false),
-            chrome.storage.local.get('$version').then(result => result.$version || "1.0.0"),
-            chrome.storage.local.get("__cr").then(result => result.__cr),
-            chrome.storage.local.get("__isProUser").then(result => result.__isProUser || false)
+            chrome.storage.local.get('$version').then(result => result.$version || "1.0.0")
         ]);
     
         // Log the loaded values for debugging
@@ -75,9 +73,7 @@ async function waitForEmailInput() {
             $lng,
             $distance,
             $jobType,
-            $active,
-            $credits,
-            $isProUser
+            $active
         });
     }
 
@@ -106,41 +102,8 @@ async function waitForEmailInput() {
         await initializeLocalStorageVariables();
     
     async function sync(force) {
-        if (force) {
-            console.log("Forced sync stopping.");
-            return;
-        }
-
-        let syncData = await chrome.storage.local.get(["__cr", "$host", "__sync", "__isProUser"]);
-        const { __cr: credits, $host: storedHost = 'https://amazonjobsschedulert.azurewebsites.net', __sync: syncIntervalMin = 1, __isProUser: isProUser } = syncData;
-        const syncInterval = syncIntervalMin * 60 * 1000;
-
-        if (isProUser) {
-            setTimeout(sync, syncInterval);
-            return;
-        }
-        let email = $username;
-
-        try {
-            const response = await fetch(`${storedHost}/set-credits`, {
-                method: "POST",
-                body: JSON.stringify({ email, version: $version, credits }),
-                headers: { "Content-type": "application/json; charset=UTF-8" }
-            });
-
-            if (!response.ok) throw new Error("Failed to sync: " + await response.text());
-            let data = await response.json();
-
-            await chrome.storage.local.set({
-                __cr: data.__cr,
-                $host: data.__host,
-                __sync: data.__sync
-            });
-        } catch (error) {
-            console.error("Sync failed, retrying in " + syncInterval + "ms", error);
-        } finally {
-            setTimeout(sync, syncInterval); // Use setTimeout to prevent stack overflow and ensure delay
-        }
+        // Sync function removed - no longer needed without credit system
+        return;
     }
     // Central function to handle all page-related activities
     async function init() {
@@ -525,9 +488,6 @@ async function waitForEmailInput() {
     
             // If a matching job card is found, click it
             if (foundJobCard) {
-                if (!$isProUser) {
-                    chrome.storage.local.set({ "__cr": Math.max(--$credits, 0) });
-                }
                 console.log('Clicking the matching job card...');
                 foundJobCard.click();
                 observer.disconnect();  // Stop observing once the job card is clicked
@@ -693,72 +653,7 @@ async function waitForEmailInput() {
                                     window.location.href = "https://hiring.amazon.com/app#/jobSearch";
                             }
             if ($active) {
-                                
-                await fetch(`https://amazonjobsschedulert.azurewebsites.net/get-config?email=${encodeURIComponent(fetchEmail)}&version=${$version}`)
-                .then(async res => {
-                    if (!res.ok) {
-                        const errorResponse = await res.json();
-                        throw new Error(errorResponse.message);
-                    }
-                    return await res.json();
-                })
-                .then(async data => {
-                    // Save the fetched values to local storage
-                    await chrome.storage.local.set({ "__cr": data.__cr, "__isProUser": data.__isProUser });
-                    
-                    // After saving, retrieve the updated value from storage to ensure consistency
-                    
-                    $isProUser = data.__isProUser;
-            
-                    console.log("Updated credits:", $credits);
-                    console.log("Updated isProUser:", $isProUser);
-            
-                    // Proceed with other operations, such as sync or further logic
-                    sync();
-                })
-                .catch(e => {
-                    // First navigate to the desired page
-                    window.location.href = "https://alertmeasap.com/contact";
-                
-                    // Use a short delay before showing the popup, allowing the page to load
-                    setTimeout(() => {
-                        Swal.fire({
-                            title: "Attention please.",
-                            html: e.message,
-                            allowEscapeKey: false,
-                            allowEnterKey: false,
-                            allowOutsideClick: false,
-                            icon: "warning",
-                            confirmButtonText: "Ok"
-                        });
-                    }, 2000); // Delay the popup by 2 seconds to give the page time to load
-                
-                    //return; // Stop further execution due to the error
-                });
-                console.log("credits :", $credits);
-                console.log("ispro :", $isProUser);
-                                    // Check if there's already an interval running
-                                    if ((!$credits || $credits <= 0) && !$isProUser) {
-                                        chrome.storage.local.set({ "__cr": Math.max(--$credits, 0) });
-                                    
-                                        return Swal.fire({
-                                            title: "Support the Developer",
-                                            html: "You're out of credits.<br> Please contact the developer to continue.<br> <br> blsappointments.ca@gmail.com",
-                                            icon: "warning",
-                                            confirmButtonText: "Contact Developer",
-                                            confirmButtonColor: "#3F458E",
-                                            allowEscapeKey: false,
-                                            allowEnterKey: false,
-                                            allowOutsideClick: false,
-                                        }).then(async action => {
-                                            return window.open(`mailto:${$to}`);
-                                        });
-                                    }
-                        
-
-            }
                 if ($active) {
-
                     if (!fetchInterval) {
                         fetchInterval = setInterval(() => {
                             if ($active) {
@@ -774,6 +669,7 @@ async function waitForEmailInput() {
                 } else {
                     console.log('Fetching is inactive as $active is false.');
                 }
+            }
 
         } else {
             console.log("Email (username) still missing after attempting to fetch candidate ID. Fetching aborted.");

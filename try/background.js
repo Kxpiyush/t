@@ -28,7 +28,6 @@ chrome['runtime']['onConnect']['addListener'](function (a) {
         chrome['declarativeContent']['onPageChanged']['addRules'](c);
     }), a === 'install' && (await chrome['storage']['local']['set']({
         '$active': ![],
-        '__cr': 0x0, // CREDIT SYSTEM: Initialize credits to 0 on install
         '__fq': 0.5,
         '__gp': 0x3,
         '__tdgp': 0x3
